@@ -1,15 +1,16 @@
 require("./database");
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+require("dot-env").config();
+const createError = require('http-errors');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
 
-var userRouter = require('./routes/userRouter');
-var roomRouter = require('./routes/roomRouter');
-var documentRouter = require('./routes/documentRouter');
+const userRouter = require('./routes/userRouter');
+const roomRouter = require('./routes/roomRouter');
+const documentRouter = require('./routes/documentRouter');
 
-var app = express();
+const app = express();
 
 app.use(logger('dev'));
 app.use(express.json());
