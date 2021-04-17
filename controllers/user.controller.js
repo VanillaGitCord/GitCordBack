@@ -26,7 +26,7 @@ module.exports.joinUser = async (req, res, next) => {
       message: null
     });
   } catch (err) {
-    console.log(err);
+    console.error(err);
     res.status(500).json({
       message: "예상치 못한 오류가 발생 했습니다!"
     });
