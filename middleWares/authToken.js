@@ -1,6 +1,7 @@
-import jwt from "jsonwebtoken";
+const jwt = require("jsonwebtoken");
 
-import User from "../model/User";
+const Room = require("../model/Room");
+const User = require("../model/User");
 
 function isTokenExpired(token) {
   const now = Date.now().valueOf() / 1000;
@@ -11,7 +12,7 @@ function isTokenValid(token, targetUser) {
   return String(token.refreshAuth) === String(targetUser.refreshAuth);
 }
 
-module.exports.authToken = (req, res, next) => {
+module.exports.authToken = async (req, res, next) => {
   const {
     body: { accessToken, refreshToken }
   } = req;
@@ -31,12 +32,12 @@ module.exports.authToken = (req, res, next) => {
         return res.json({ message: "Token expired" });
       }
 
-      const refreshTargetUser = await User.findOne({ 
+      const refreshTargetUser = await User.findOne({
         email: decodedRefreshToken.email
       }).lean();
 
       if (isTokenValid(decodedRefreshToken, refreshTargetUser)) {
-        return res.json({ warning: "Invalid Token" });
+        return res.json({ message: "Invalid Token" });
       }
 
       const newAccessToken = jwt.sign(
@@ -49,17 +50,17 @@ module.exports.authToken = (req, res, next) => {
         }
       );
 
-      return res.json({
-        user: refreshTargetUser,
-        accessToken: newAccessToken,
-      });
+      req.user = refreshTargetUser;
+      req.accessToken = newAccessToken;
+      next();
     }
 
-    const user = await User.findOne({ email: decodedAccessToken.email }).lean();
+    const user = await User.findOne({
+      email: decodedAccessToken.email
+    }).lean();
 
-    res.json({
-      user
-    });
+    req.user = user;
+    next();
   } catch (err) {
     console.error(err);
     res.status(500).json({ warning: "Internal server Error" });
