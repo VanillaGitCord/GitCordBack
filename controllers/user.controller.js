@@ -38,57 +38,50 @@ module.exports.loginUser = async (req, res, next) => {
     body: { email, password }
   } = req;
 
-  const user = await User.findOne({ email }).lean();
+  try {
+    const user = await User.findOne({ email }).lean();
 
-  if (!user) return res.json({
-    message: "이메일을 확인해주세요!",
-    caused: "email"
-  })
+    if (!user) return res.json({
+      message: "이메일을 확인해주세요!",
+      caused: "email"
+    })
 
-  const isPasswordOk = await isPasswordValid(user, password);
+    const isPasswordOk = await isPasswordValid(user, password);
+    if (!isPasswordOk) return res.json({
+      message: "비밀번호를 확인해주세요!",
+      caused: "password"
+    });
 
-  if (!isPasswordOk) return res.json({
-    message: "비밀번호를 확인해주세요!",
-    caused: "password"
-  });
+    const accessToken = jwt.sign(
+      {
+        email
+      },
+      process.env.JWT_SECRET_KEY
+    );
 
-  const accessToken = jwt.sign(
-    {
-      email
-    },
-    process.env.JWT_SECRET_KEY
-  );
+    const refreshAuth = String(Math.random() * Math.pow(10, 16));
+    await User.findByIdAndUpdate(user._id, { $set: { refreshAuth }});
+    const refreshToken = jwt.sign(
+      {
+        email,
+        refreshAuth
+      },
+      process.env.JWT_SECRET_KEY
+    );
 
-  const refreshAuth = String(Math.random() * Math.pow(10, 16));
-
-  await User.findByIdAndUpdate(user._id, { $set: { refreshAuth }})
-
-  const refreshToken = jwt.sign(
-    {
-      email,
-      refreshAuth
-    },
-    process.env.JWT_SECRET_KEY
-  );
-
-  res.json({
-    accessToken,
-    refreshToken,
-    message: null,
-    caused: null
-  });
-
-  /*
-  res.json({
-    message: "E-mail을 확인해주세요!"
-  });
-  res.json({
-    message: "Password를 확인해주세요!"
-  });
-  res.status(500).json({
-    message: "예상치 못한 오류가 발생 했습니다!"
-  });
-  */
+    res.json({
+      accessToken,
+      refreshToken,
+      message: null,
+      caused: null,
+      email: user.email,
+      name: user.name
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "예상치 못한 오류가 발생 했습니다!"
+    });
+  }
 }
 
 async function isPasswordValid(user, password) {
