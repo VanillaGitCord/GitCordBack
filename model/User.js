@@ -9,27 +9,27 @@ const User = new mongoose.Schema({
       validator: function(v) {
         return v.match(/\w+@\w+.\w+/g);
       },
-      message: props => `${props.value} is not a valid Email!`,
+      message: props => `${props.value} is not a valid Email!`
     }
   },
   password: {
     type: String,
-    require: true,
+    require: true
   },
   name: {
     type: String,
-    require: true,
+    require: true
   },
   document: {
     type: [{
       type: mongoose.Types.ObjectId,
-      ref: "Document",
+      ref: "Document"
     }],
-    default: [],
+    default: []
   },
   refreshAuth: {
     type: String,
-    default: "",
+    default: ""
   }
 });
 

@@ -3,15 +3,15 @@ const mongoose = require("mongoose");
 const Document = new mongoose.Schema({
   content: {
     type: String,
-    default: "",
+    default: ""
   },
   owner: {
     type: mongoose.Types.ObjectId,
-    ref: "User",
+    ref: "User"
   },
   history: {
     type: [String],
-    default: [],
+    default: []
   }
 });
 
