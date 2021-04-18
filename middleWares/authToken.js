@@ -41,11 +41,11 @@ module.exports.authToken = async (req, res, next) => {
 
       const newAccessToken = jwt.sign(
         {
-          email: refreshTargetUser.email,
+          email: refreshTargetUser.email
         },
         process.env.JWT_SECRET,
         {
-          expiresIn: "30m",
+          expiresIn: "30m"
         }
       );
 
