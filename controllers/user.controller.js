@@ -4,12 +4,21 @@ const jwt = require("jsonwebtoken");
 const User = require("../model/User");
 const Document = require("../model/Document");
 
+async function isUserEmailExist(email) {
+  const user = await User.findOne({ email }).lean();
+  return user;
+}
+
 module.exports.joinUser = async (req, res, next) => {
   const {
     body: { email, password, name }
   } = req;
 
   try {
+    if (await isUserEmailExist(email)) return res.json({
+      message: "이미 존재하는 E-mail입니다!"
+    });
+
     await User.create({
       email,
       password: await argon2.hash(password),
@@ -60,7 +69,10 @@ module.exports.loginUser = async (req, res, next) => {
       {
         email
       },
-      process.env.JWT_SECRET_KEY
+      process.env.JWT_SECRET_KEY,
+      {
+        expiresIn: "30m",
+      }
     );
 
     const refreshAuth = String(Math.random() * Math.pow(10, 16));
@@ -70,7 +82,10 @@ module.exports.loginUser = async (req, res, next) => {
         email,
         refreshAuth
       },
-      process.env.JWT_SECRET_KEY
+      process.env.JWT_SECRET_KEY,
+      {
+        expiresIn: "1d",
+      }
     );
 
     res.json({
@@ -108,7 +123,10 @@ module.exports.googleLogin = async (req, res, next) => {
       {
         email
       },
-      process.env.JWT_SECRET_KEY
+      process.env.JWT_SECRET_KEY,
+      {
+        expiresIn: "30m",
+      }
     );
 
     const refreshAuth = String(Math.random() * Math.pow(10, 16));
@@ -118,7 +136,10 @@ module.exports.googleLogin = async (req, res, next) => {
         email,
         refreshAuth
       },
-      process.env.JWT_SECRET_KEY
+      process.env.JWT_SECRET_KEY,
+      {
+        expiresIn: "1d",
+      }
     );
 
     res.json({
