@@ -3,12 +3,14 @@ const User = require("../model/User");
 
 module.exports.createRoom = async (req, res, next) => {
   const {
-    body: { roomTitle, userEmail }
+    user,
+    accessToken,
+    body: { roomTitle }
   } = req;
 
   try {
     const currentUser = await User.findOne({
-      email: userEmail
+      email: user.email
     }).lean();
 
     await Room.create({
@@ -22,7 +24,8 @@ module.exports.createRoom = async (req, res, next) => {
 
     res.json({
       message: null,
-      roomId: newRoom._id
+      roomId: newRoom._id,
+      accessToken
     });
   } catch (err) {
     console.error(err);
