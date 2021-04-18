@@ -7,8 +7,6 @@ module.exports.joinUser = async (req, res, next) => {
     body: { email, password, name }
   } = req;
 
-  console.log(email, password, name);
-
   try {
     await User.create({
       email,
