@@ -43,7 +43,7 @@ module.exports.joinUser = async (req, res, next) => {
 };
 
 async function isPasswordValid(user, password) {
-  return await argon2.verify(user.password, password)
+  return await argon2.verify(user.password, password);
 }
 
 module.exports.loginUser = async (req, res, next) => {
