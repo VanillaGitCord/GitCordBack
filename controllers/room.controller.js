@@ -6,11 +6,11 @@ module.exports.createRoom = async (req, res, next) => {
     body: { roomTitle, userEmail }
   } = req;
 
-  const currentUser = await User.findOne({
-    email: userEmail
-  }).lean();
-
   try {
+    const currentUser = await User.findOne({
+      email: userEmail
+    }).lean();
+
     await Room.create({
       owner: currentUser._id,
       title: roomTitle
@@ -25,7 +25,6 @@ module.exports.createRoom = async (req, res, next) => {
       roomId: newRoom._id
     });
   } catch (err) {
-    console.log("에?");
     console.error(err);
     res.status(500).json({
       message: "예상치 못한 오류가 발생 했습니다!"
