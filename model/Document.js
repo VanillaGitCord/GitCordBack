@@ -12,10 +12,6 @@ const Document = new mongoose.Schema({
   history: {
     type: [String],
     default: []
-  },
-  room: {
-    type: mongoose.Types.ObjectId,
-    ref: "Room"
   }
 });
 

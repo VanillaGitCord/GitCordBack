@@ -1,3 +1,5 @@
+require("dotenv").config();
+require("./database");
 const createError = require("http-errors");
 const express = require("express");
 const path = require("path");
@@ -10,9 +12,6 @@ const roomRouter = require("./routes/roomRouter");
 const documentRouter = require("./routes/documentRouter");
 
 const app = express();
-
-require("dotenv").config();
-require("./database");
 
 app.use(logger("dev"));
 app.use(express.json());

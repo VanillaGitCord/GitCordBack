@@ -14,29 +14,18 @@ const User = new mongoose.Schema({
   },
   password: {
     type: String,
-    require: true,
-    validate: {
-      validator: function(v) {
-        return v.match(/^(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{4,16}$/g);
-      },
-      message: props => `${props.value} is not a valid Email!`
-    }
+    require: true
   },
   name: {
     type: String,
     require: true
   },
-  joinRoom: {
+  document: {
     type: [{
       type: mongoose.Types.ObjectId,
-      ref: "Room"
+      ref: "Document"
     }],
     default: []
-  },
-  myRoom: {
-    type: mongoose.Types.ObjectId,
-    ref: "Room",
-    default: ""
   },
   refreshAuth: {
     type: String,
