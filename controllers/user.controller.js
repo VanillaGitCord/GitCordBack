@@ -33,6 +33,10 @@ module.exports.joinUser = async (req, res, next) => {
   }
 };
 
+async function isPasswordValid(user, password) {
+  return await argon2.verify(user.password, password)
+}
+
 module.exports.loginUser = async (req, res, next) => {
   const {
     body: { email, password }
@@ -84,6 +88,50 @@ module.exports.loginUser = async (req, res, next) => {
   }
 }
 
-async function isPasswordValid(user, password) {
-  return await argon2.verify(user.password, password)
+module.exports.googleLogin = async (req, res, next) => {
+  const {
+    body: { email, name }
+  } = req;
+
+  try {
+    const googleUser = await User.findOne({ email }).lean();
+    if (!googleUser) {
+      await User.create({
+        email,
+        name
+      });
+    }
+
+    const user = await User.findOne({ email }).lean();
+
+    const accessToken = jwt.sign(
+      {
+        email
+      },
+      process.env.JWT_SECRET_KEY
+    );
+
+    const refreshAuth = String(Math.random() * Math.pow(10, 16));
+    await User.findByIdAndUpdate(user._id, { $set: { refreshAuth }});
+    const refreshToken = jwt.sign(
+      {
+        email,
+        refreshAuth
+      },
+      process.env.JWT_SECRET_KEY
+    );
+
+    res.json({
+      accessToken,
+      refreshToken,
+      message: null,
+      caused: null,
+      email: user.email,
+      name: user.name
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "예상치 못한 오류가 발생 했습니다!"
+    });
+  }
 }
