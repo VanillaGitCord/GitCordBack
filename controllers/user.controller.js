@@ -6,6 +6,7 @@ const Document = require("../model/Document");
 
 async function isUserEmailExist(email) {
   const user = await User.findOne({ email }).lean();
+
   return user;
 }
 
@@ -60,6 +61,7 @@ module.exports.loginUser = async (req, res, next) => {
     })
 
     const isPasswordOk = await isPasswordValid(user, password);
+
     if (!isPasswordOk) return res.json({
       message: "비밀번호를 확인해주세요!",
       caused: "password"
@@ -71,12 +73,14 @@ module.exports.loginUser = async (req, res, next) => {
       },
       process.env.JWT_SECRET_KEY,
       {
-        expiresIn: "30m",
+        expiresIn: "30m"
       }
     );
 
     const refreshAuth = String(Math.random() * Math.pow(10, 16));
+
     await User.findByIdAndUpdate(user._id, { $set: { refreshAuth }});
+
     const refreshToken = jwt.sign(
       {
         email,
@@ -84,7 +88,7 @@ module.exports.loginUser = async (req, res, next) => {
       },
       process.env.JWT_SECRET_KEY,
       {
-        expiresIn: "1d",
+        expiresIn: "1d"
       }
     );
 
@@ -110,6 +114,7 @@ module.exports.googleLogin = async (req, res, next) => {
 
   try {
     const googleUser = await User.findOne({ email }).lean();
+
     if (!googleUser) {
       await User.create({
         email,
@@ -125,12 +130,14 @@ module.exports.googleLogin = async (req, res, next) => {
       },
       process.env.JWT_SECRET_KEY,
       {
-        expiresIn: "30m",
+        expiresIn: "30m"
       }
     );
 
     const refreshAuth = String(Math.random() * Math.pow(10, 16));
+
     await User.findByIdAndUpdate(user._id, { $set: { refreshAuth }});
+
     const refreshToken = jwt.sign(
       {
         email,
@@ -138,7 +145,7 @@ module.exports.googleLogin = async (req, res, next) => {
       },
       process.env.JWT_SECRET_KEY,
       {
-        expiresIn: "1d",
+        expiresIn: "1d"
       }
     );
 
