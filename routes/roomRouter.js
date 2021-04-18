@@ -1,25 +1,11 @@
-var express = require('express');
-var router = express.Router();
+const express = require("express");
+const router = express.Router();
 
-router.get('/:room_id', function(req, res, next) {
-  const {
-    body: { userEmail },
-    params: { room_id }
-  } = req;
+const { createRoom } = require("../controllers/room.controller");
 
-  res.json({
-    content,
-    message: null
-  });
+router.post("/", createRoom);
 
-  /*
-  res.status(500).json({
-    message: "예상치 못한 오류가 발생 했습니다!"
-  });
-  */
-});
-
-router.post('/', function(req, res, next) {
+router.post("/", function(req, res, next) {
   const {
     body: { accessToken, refreshToken },
     params: { room_id }

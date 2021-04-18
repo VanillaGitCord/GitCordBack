@@ -26,7 +26,9 @@ module.exports.joinUser = async (req, res, next) => {
       name
     });
 
-    const newUser = await User.findOne({ email }).lean();
+    const newUser = await User.findOne({
+      email
+    }).lean();
 
     await Document.create({
       owner: newUser._id
