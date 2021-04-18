@@ -1,6 +1,5 @@
 const jwt = require("jsonwebtoken");
 
-const Room = require("../model/Room");
 const User = require("../model/User");
 
 function isTokenExpired(token) {
