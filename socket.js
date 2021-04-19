@@ -32,6 +32,7 @@ module.exports = function socket(app) {
       }
 
       app.io.to(roomId).emit("receive participants", activatedRoomList.get(roomId));
+      app.io.emit("receive activeRoomList", Object.fromEntries(activatedRoomList));
     });
 
     socket.on("bye", (email, roomId) => {
