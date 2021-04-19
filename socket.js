@@ -1,15 +1,15 @@
 const activatedRoomList = new Map();
 
 module.exports = function socket(app) {
-  app.io = require("socket.io")();
+  app.io = require("socket.io")({
+    cors: {
+      origin: "*"
+    }
+  });
 
   app.io.on("connection", (socket) => {
     socket.on("join", (roomId) => {
       socket.join(roomId);
-    });
-
-    socket.on("disconnect", () => {
-      app.io.emit("activatedRoomList", Array.from(activatedRoomList.keys()));
     });
 
     socket.on("init", (user, roomInfo) => {
@@ -31,12 +31,27 @@ module.exports = function socket(app) {
         activatedRoomList.set(roomId, newRoom);
       }
 
-      app.io.emit("receive participants", activatedRoomList.get(roomId));
+      app.io.to(roomId).emit("receive participants", activatedRoomList.get(roomId));
     });
 
-    socket.on("bye", (user) => {
-      activatedRoomList.delete(user.email);
-      socket.disconnect();
+    socket.on("bye", (email, roomId) => {
+      let currentRoom = activatedRoomList.get(roomId);
+
+      if (!currentRoom) return;
+
+      if (currentRoom.owner === email) {
+        activatedRoomList.delete(roomId);
+
+        app.io.to(roomId).emit("receive participants", null);
+      } else {
+        const filtedJoinUser = currentRoom.joinUsers.filter(
+          (joinUser) => joinUser !== email
+        );
+
+        currentRoom.joinUsers = filtedJoinUser;
+        app.io.to(roomId).emit("receive participants", activatedRoomList.get(roomId));
+        app.io.emit("receive activeRoomList", Object.fromEntries(activatedRoomList));
+      }
     });
 
     socket.on("send chat", (chatLog) => {
