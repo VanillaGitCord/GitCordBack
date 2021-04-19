@@ -19,12 +19,13 @@ module.exports.createRoom = async (req, res, next) => {
     });
 
     const newRoom = await Room.findOne({
-      owner: currentUser._id
+      title: roomTitle
     }).lean();
 
     res.json({
       message: null,
       roomId: newRoom._id,
+      roomTitle: newRoom.title,
       accessToken
     });
   } catch (err) {

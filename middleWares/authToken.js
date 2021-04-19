@@ -35,7 +35,7 @@ module.exports.authToken = async (req, res, next) => {
         email: decodedRefreshToken.email
       }).lean();
 
-      if (isTokenValid(decodedRefreshToken, refreshTargetUser)) {
+      if (!isTokenValid(decodedRefreshToken, refreshTargetUser)) {
         return res.json({ message: "Invalid Token" });
       }
 
@@ -43,7 +43,7 @@ module.exports.authToken = async (req, res, next) => {
         {
           email: refreshTargetUser.email
         },
-        process.env.JWT_SECRET,
+        process.env.JWT_SECRET_KEY,
         {
           expiresIn: "30m"
         }
@@ -51,7 +51,7 @@ module.exports.authToken = async (req, res, next) => {
 
       req.user = refreshTargetUser;
       req.accessToken = newAccessToken;
-      next();
+      return next();
     }
 
     const user = await User.findOne({
