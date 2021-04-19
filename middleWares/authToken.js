@@ -4,6 +4,7 @@ const User = require("../model/User");
 
 function isTokenExpired(token) {
   const now = Date.now().valueOf() / 1000;
+
   return !token || (token.exp < now);
 }
 
