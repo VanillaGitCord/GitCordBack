@@ -1,4 +1,4 @@
-const participants = new Map();
+const activatedRoomList = new Map();
 
 module.exports = function socket(app) {
   app.io = require("socket.io")();
@@ -9,21 +9,44 @@ module.exports = function socket(app) {
     });
 
     socket.on("disconnect", () => {
-      app.io.emit("participants", Array.from(participants.keys()));
+      app.io.emit("activatedRoomList", Array.from(activatedRoomList.keys()));
     });
 
-    socket.on("init", (user) => {
-      user.email && participants.set(user.emil, socket.id);
-      app.io.emit("participants", Array.from(participants.keys()));
+    socket.on("init", (user, roomInfo) => {
+      if (!user.email) return;
+
+      const { roomTitle, roomId } = roomInfo;
+
+      if (activatedRoomList.has(roomId)) {
+        const roomUserList = activatedRoomList.get(roomId);
+
+        user.email && roomUserList.joinUsers.push(user.email);
+      } else {
+        const newRoom = {
+          roomTitle,
+          joinUsers: [user.email],
+          owner: user.email
+        };
+
+        activatedRoomList.set(roomId, newRoom);
+      }
+
+      app.io.emit("receive participants", activatedRoomList.get(roomId));
     });
 
     socket.on("bye", (user) => {
-      participants.delete(user.email);
+      activatedRoomList.delete(user.email);
       socket.disconnect();
     });
 
-    socket.on("send chat", (chat, roomId) => {
-      app.io.to(roomId).emit("receive chat", chat);
+    socket.on("send chat", (chatLog) => {
+      const { roomId } = chatLog;
+
+      app.io.to(roomId).emit("receive chat", chatLog);
+    });
+
+    socket.on("init roomList", () => {
+      app.io.emit("receive activeRoomList", Object.fromEntries(activatedRoomList));
     });
 
     socket.on("changeEvent", (data) => {
