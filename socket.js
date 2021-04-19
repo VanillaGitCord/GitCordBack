@@ -18,13 +18,21 @@ module.exports = function socket(app) {
       const { roomTitle, roomId } = roomInfo;
 
       if (activatedRoomList.has(roomId)) {
-        const roomUserList = activatedRoomList.get(roomId);
+        const { participants } = activatedRoomList.get(roomId).roomUserList;
 
-        user.email && roomUserList.joinUsers.push(user.email);
+        if (user.email) {
+          participants = participants.map(participant => {
+            if (participant.email === user.email) {
+              participant.socketId = socket.id;
+            }
+
+            return participant;
+          });
+        }
       } else {
         const newRoom = {
           roomTitle,
-          joinUsers: [user.email],
+          participants: [{ email: user.email, socketId: socket.id }],
           owner: user.email
         };
 
@@ -32,6 +40,14 @@ module.exports = function socket(app) {
       }
 
       app.io.to(roomId).emit("receive participants", activatedRoomList.get(roomId));
+    });
+
+    socket.on("sending signal", payload => {
+      app.io.to(payload.userToSignal).emit("user joined", { signal: payload.signal, callerID: payload.callerID });
+    });
+
+    socket.on("returning signal", payload => {
+      app.io.to(payload.callerID).emit("receiving returned signal", { signal: payload.signal, id: socket.id });
     });
 
     socket.on("bye", (email, roomId) => {
@@ -44,11 +60,11 @@ module.exports = function socket(app) {
 
         app.io.to(roomId).emit("receive participants", null);
       } else {
-        const filtedJoinUser = currentRoom.joinUsers.filter(
-          (joinUser) => joinUser !== email
+        const filtedParticipants = currentRoom.participants.filter(
+          (participant) => participant.email !== email
         );
 
-        currentRoom.joinUsers = filtedJoinUser;
+        currentRoom.participants = filtedParticipants;
         app.io.to(roomId).emit("receive participants", activatedRoomList.get(roomId));
         app.io.emit("receive activeRoomList", Object.fromEntries(activatedRoomList));
       }
