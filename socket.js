@@ -4,7 +4,9 @@ module.exports = function socket(app) {
   app.io = require("socket.io")();
 
   app.io.on("connection", (socket) => {
-    socket.emit("socket Id", socket.id);
+    socket.on("join", (roomId) => {
+      socket.join(roomId);
+    });
 
     socket.on("disconnect", () => {
       app.io.emit("participants", Array.from(participants.keys()));
