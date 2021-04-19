@@ -135,7 +135,7 @@ module.exports.googleLogin = async (req, res, next) => {
         expiresIn: "30m"
       }
     );
-    console.log(accessToken);
+
     const refreshAuth = String(Math.random() * Math.pow(10, 16));
 
     await User.findByIdAndUpdate(user._id, { $set: { refreshAuth }});
