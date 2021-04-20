@@ -8,15 +8,13 @@ module.exports = function socket(app) {
   });
 
   app.io.on("connection", (socket) => {
-    socket.on("join", (roomId) => {
-      socket.join(roomId);
-    });
-
-    socket.on("init", (user, roomInfo) => {
+    // main 페이지 입장 시 로직
+    socket.on("join", (user, roomId) => {
       if (!user.email) return;
 
-      const { roomTitle, roomId } = roomInfo;
+      const { email } = user;
 
+<<<<<<< HEAD
       if (activatedRoomList.has(roomId)) {
         const { participants } = activatedRoomList.get(roomId).roomUserList;
 
@@ -34,13 +32,38 @@ module.exports = function socket(app) {
           roomTitle,
           participants: [{ email: user.email, socketId: socket.id }],
           owner: user.email
+=======
+      socket.join(roomId);
+
+      if (activatedRoomList.has(roomId)) {
+        const targetRoomInfo = activatedRoomList.get(roomId);
+        const userInfo = {
+          email,
+          isOwner: targetRoomInfo.owner === email,
+          socketId: socket.id
+>>>>>>> dev
         };
 
-        activatedRoomList.set(roomId, newRoom);
+        targetRoomInfo.participants.push(userInfo);
       }
 
-      app.io.to(roomId).emit("receive participants", activatedRoomList.get(roomId));
-      app.io.emit("receive activeRoomList", Object.fromEntries(activatedRoomList));
+      app.io.to(roomId).emit(
+        "receive targetRoomInfo", activatedRoomList.get(roomId)
+      );
+    });
+
+    socket.on("create room", (user, roomInfo) => {
+      const { email } = user;
+      const { title, roomId } = roomInfo;
+
+      const newRoom = {
+        roomTitle: title,
+        owner: email,
+        participants: [],
+        contents: ""
+      };
+
+      activatedRoomList.set(roomId, newRoom);
     });
 
     socket.on("sending signal", payload => {
@@ -61,13 +84,21 @@ module.exports = function socket(app) {
 
         app.io.to(roomId).emit("receive participants", null);
       } else {
+<<<<<<< HEAD
         const filtedParticipants = currentRoom.participants.filter(
           (participant) => participant.email !== email
         );
 
         currentRoom.participants = filtedParticipants;
+=======
+        const filtedJoinUser = currentRoom.participants.filter(
+          (participant) => participant !== email
+        );
+
+        currentRoom.participants = filtedJoinUser;
+>>>>>>> dev
         app.io.to(roomId).emit("receive participants", activatedRoomList.get(roomId));
-        app.io.emit("receive activeRoomList", Object.fromEntries(activatedRoomList));
+        app.io.emit("receive activeRoomList", Array.from(activatedRoomList.keys()));
       }
     });
 
@@ -78,11 +109,26 @@ module.exports = function socket(app) {
     });
 
     socket.on("init roomList", () => {
-      app.io.emit("receive activeRoomList", Object.fromEntries(activatedRoomList));
+      app.io.emit("receive activeRoomList", Array.from(activatedRoomList.keys()));
     });
 
     socket.on("changeEvent", (data) => {
       app.io.emit("changeEvent", data);
+    });
+
+    socket.on("send codeEditor text", (data) => {
+      const { value, roomId } = data;
+      const roomInfo = activatedRoomList.get(roomId);
+
+      roomInfo.contents = value;
+      app.io.to(roomId).emit("receive codeEditor text", value);
+    });
+
+    socket.on("set initial text", (roomId) => {
+      const roomInfo = activatedRoomList.get(roomId);
+
+      if (!roomInfo) return;
+      app.io.to(roomId).emit("receive initial text", roomInfo.contents);
     });
   });
 }
