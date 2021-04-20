@@ -14,25 +14,6 @@ module.exports = function socket(app) {
 
       const { email } = user;
 
-<<<<<<< HEAD
-      if (activatedRoomList.has(roomId)) {
-        const { participants } = activatedRoomList.get(roomId).roomUserList;
-
-        if (user.email) {
-          participants = participants.map(participant => {
-            if (participant.email === user.email) {
-              participant.socketId = socket.id;
-            }
-
-            return participant;
-          });
-        }
-      } else {
-        const newRoom = {
-          roomTitle,
-          participants: [{ email: user.email, socketId: socket.id }],
-          owner: user.email
-=======
       socket.join(roomId);
 
       if (activatedRoomList.has(roomId)) {
@@ -41,7 +22,6 @@ module.exports = function socket(app) {
           email,
           isOwner: targetRoomInfo.owner === email,
           socketId: socket.id
->>>>>>> dev
         };
 
         targetRoomInfo.participants.push(userInfo);
@@ -84,19 +64,11 @@ module.exports = function socket(app) {
 
         app.io.to(roomId).emit("receive participants", null);
       } else {
-<<<<<<< HEAD
         const filtedParticipants = currentRoom.participants.filter(
           (participant) => participant.email !== email
         );
 
         currentRoom.participants = filtedParticipants;
-=======
-        const filtedJoinUser = currentRoom.participants.filter(
-          (participant) => participant !== email
-        );
-
-        currentRoom.participants = filtedJoinUser;
->>>>>>> dev
         app.io.to(roomId).emit("receive participants", activatedRoomList.get(roomId));
         app.io.emit("receive activeRoomList", Array.from(activatedRoomList.keys()));
       }
