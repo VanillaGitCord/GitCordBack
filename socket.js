@@ -14,8 +14,6 @@ module.exports = function socket(app) {
     socket.on("join", (user, roomId) => {
       if (!user.email) return;
 
-      console.log("user join activate", roomId, user);
-
       const { email } = user;
 
       socket.join(roomId);
@@ -55,12 +53,10 @@ module.exports = function socket(app) {
     });
 
     socket.on("sending signal", payload => {
-      console.log("sending signal", payload);
-      app.io.to(payload.userToSignal).emit("user joined", { signal: payload.signal, callerID: payload.callerID });
+      app.io.to(payload.userToSignal).emit("user joined", { signal: payload.signal, isOwner: payload.isUserOwner, callerID: payload.callerID });
     });
 
     socket.on("returning signal", payload => {
-      console.log("returning signal", payload);
       app.io.to(payload.callerID).emit("receiving returned signal", { signal: payload.signal, id: socket.id });
     });
 
@@ -74,6 +70,9 @@ module.exports = function socket(app) {
 
         app.io.to(roomId).emit("receive participants", null);
       } else {
+        const targetParticipant = currentRoom.participants.find(
+          (participant) => participant.email === email
+        );
         const filtedparticipants = currentRoom.participants.filter(
           (participant) => participant.email !== email
         );
@@ -88,6 +87,11 @@ module.exports = function socket(app) {
         app.io.emit(
           "receive activeRoomList",
           Array.from(activatedRoomList.entries())
+        );
+
+        app.io.to(roomId).emit(
+          "user left",
+          targetParticipant
         );
       }
     });
