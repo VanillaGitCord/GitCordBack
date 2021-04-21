@@ -32,7 +32,8 @@ module.exports = function socket(app) {
       );
 
       app.io.to(roomId).emit(
-        "receive targetRoomInfo", activatedRoomList.get(roomId)
+        "receive targetRoomInfo",
+        activatedRoomList.get(roomId)
       );
     });
 
@@ -50,11 +51,22 @@ module.exports = function socket(app) {
     });
 
     socket.on("sending signal", payload => {
-      app.io.to(payload.userToSignal).emit("user joined", { signal: payload.signal, isOwner: payload.isUserOwner, callerID: payload.callerID });
+      app.io.to(payload.userToSignal).emit(
+        "user joined",
+        {
+          signal: payload.signal,
+          isOwner: payload.isUserOwner,
+          callerID: payload.callerID
+        });
     });
 
     socket.on("returning signal", payload => {
-      app.io.to(payload.callerID).emit("receiving returned signal", { signal: payload.signal, id: socket.id });
+      app.io.to(payload.callerID).emit(
+        "receiving returned signal",
+        {
+          signal: payload.signal,
+          id: socket.id
+        });
     });
 
     socket.on("bye", (email, roomId) => {
