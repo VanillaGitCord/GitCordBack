@@ -1,4 +1,5 @@
 const activatedRoomList = new Map();
+const typingUsersInEachRoom = new Map();
 
 module.exports = function socket(app) {
   app.io = require("socket.io")({
@@ -48,6 +49,7 @@ module.exports = function socket(app) {
       };
 
       activatedRoomList.set(roomId, newRoom);
+      typingUsersInEachRoom.set(roomId, new Map());
     });
 
     socket.on("sending signal", payload => {
@@ -122,12 +124,41 @@ module.exports = function socket(app) {
       app.io.emit("changeEvent", data);
     });
 
-    socket.on("send codeEditor text", (data) => {
-      const { value, roomId } = data;
-      const roomInfo = activatedRoomList.get(roomId);
+    socket.on("start typing", (data) => {
+      const {
+        typingUser: { name, email },
+        value,
+        roomId
+      } = data;
+      const typingUsers = typingUsersInEachRoom.get(roomId);
+      const targetRoomInfo = activatedRoomList.get(roomId);
 
-      roomInfo.contents = value;
-      app.io.to(roomId).emit("receive codeEditor text", value);
+      targetRoomInfo.contents = value;
+      typingUsers.set(email, name);
+
+      const typingInfo = {
+        text: value,
+        typingUsers: Array.from(typingUsers.values())
+      };
+
+      app.io.to(roomId).emit("receive text", typingInfo);
+    });
+
+    socket.on("stop typing", (stopTypingUserInfo) => {
+      if (!stopTypingUserInfo) return;
+
+      const {
+        typingUser: { email },
+        roomId
+      } = stopTypingUserInfo;
+      const typingUsers = typingUsersInEachRoom.get(roomId);
+
+      typingUsers.delete(email);
+
+      app.io.to(roomId).emit(
+        "receive filtered user list",
+        typingUsers
+      );
     });
 
     socket.on("set initial text", (roomId) => {
