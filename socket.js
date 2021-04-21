@@ -1,3 +1,6 @@
+/*
+
+*/
 const activatedRoomList = new Map();
 
 module.exports = function socket(app) {
@@ -11,6 +14,8 @@ module.exports = function socket(app) {
     // main 페이지 입장 시 로직
     socket.on("join", (user, roomId) => {
       if (!user.email) return;
+
+      console.log("user join activate", roomId, user);
 
       const { email } = user;
 
@@ -26,6 +31,8 @@ module.exports = function socket(app) {
 
         targetRoomInfo.participants.push(userInfo);
       }
+
+      console.log("shoot!", activatedRoomList);
 
       app.io.to(roomId).emit(
         "receive targetRoomInfo", activatedRoomList.get(roomId)
@@ -47,10 +54,12 @@ module.exports = function socket(app) {
     });
 
     socket.on("sending signal", payload => {
+      console.log("sending signal", payload);
       app.io.to(payload.userToSignal).emit("user joined", { signal: payload.signal, callerID: payload.callerID });
     });
 
     socket.on("returning signal", payload => {
+      console.log("returning signal", payload);
       app.io.to(payload.callerID).emit("receiving returned signal", { signal: payload.signal, id: socket.id });
     });
 
