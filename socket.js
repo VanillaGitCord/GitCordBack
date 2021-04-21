@@ -8,7 +8,6 @@ module.exports = function socket(app) {
   });
 
   app.io.on("connection", (socket) => {
-    // main 페이지 입장 시 로직
     socket.on("join", (user, roomId) => {
       if (!user.email) return;
 
@@ -27,6 +26,11 @@ module.exports = function socket(app) {
         targetRoomInfo.participants.push(userInfo);
       }
 
+      app.io.emit(
+        "receive activeRoomList",
+        Array.from(activatedRoomList.entries())
+      );
+
       app.io.to(roomId).emit(
         "receive targetRoomInfo", activatedRoomList.get(roomId)
       );
@@ -35,7 +39,6 @@ module.exports = function socket(app) {
     socket.on("create room", (user, roomInfo) => {
       const { email } = user;
       const { title, roomId } = roomInfo;
-
       const newRoom = {
         roomTitle: title,
         owner: email,
@@ -56,13 +59,21 @@ module.exports = function socket(app) {
 
         app.io.to(roomId).emit("receive participants", null);
       } else {
-        const filtedJoinUser = currentRoom.participants.filter(
-          (participant) => participant !== email
+        const filtedparticipants = currentRoom.participants.filter(
+          (participant) => participant.email !== email
         );
 
-        currentRoom.participants = filtedJoinUser;
-        app.io.to(roomId).emit("receive participants", activatedRoomList.get(roomId));
-        app.io.emit("receive activeRoomList", Array.from(activatedRoomList.keys()));
+        currentRoom.participants = filtedparticipants;
+
+        app.io.to(roomId).emit(
+          "receive participants",
+          activatedRoomList.get(roomId)
+        );
+
+        app.io.emit(
+          "receive activeRoomList",
+          Array.from(activatedRoomList.entries())
+        );
       }
     });
 
@@ -73,7 +84,10 @@ module.exports = function socket(app) {
     });
 
     socket.on("init roomList", () => {
-      app.io.emit("receive activeRoomList", Array.from(activatedRoomList.keys()));
+      app.io.emit(
+        "receive activeRoomList",
+        Array.from(activatedRoomList.entries())
+        );
     });
 
     socket.on("changeEvent", (data) => {
