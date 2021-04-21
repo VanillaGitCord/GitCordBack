@@ -74,15 +74,6 @@ module.exports = function socket(app) {
 
         app.io.to(roomId).emit("receive participants", null);
       } else {
-<<<<<<< HEAD
-        const filtedParticipants = currentRoom.participants.filter(
-          (participant) => participant.email !== email
-        );
-
-        currentRoom.participants = filtedParticipants;
-        app.io.to(roomId).emit("receive participants", activatedRoomList.get(roomId));
-        app.io.emit("receive activeRoomList", Array.from(activatedRoomList.keys()));
-=======
         const filtedparticipants = currentRoom.participants.filter(
           (participant) => participant.email !== email
         );
@@ -98,7 +89,6 @@ module.exports = function socket(app) {
           "receive activeRoomList",
           Array.from(activatedRoomList.entries())
         );
->>>>>>> dev
       }
     });
 
