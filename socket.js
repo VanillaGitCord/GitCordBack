@@ -1,6 +1,3 @@
-/*
-
-*/
 const activatedRoomList = new Map();
 
 module.exports = function socket(app) {
