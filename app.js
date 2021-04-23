@@ -8,7 +8,6 @@ const logger = require("morgan");
 const cors = require("cors");
 
 const userRouter = require("./routes/userRouter");
-const roomRouter = require("./routes/roomRouter");
 const authRouter = require("./routes/authRouter");
 const documentRouter = require("./routes/documentRouter");
 
@@ -27,7 +26,6 @@ app.use(cors({
 require("./socket")(app);
 
 app.use("/user", userRouter);
-app.use("/room", roomRouter);
 app.use("/auth", authRouter);
 app.use("/document", documentRouter);
 
