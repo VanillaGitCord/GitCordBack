@@ -12,7 +12,11 @@ async function isUserEmailExist(email) {
 
 module.exports.joinUser = async (req, res, next) => {
   const {
-    body: { email, password, name }
+    body: {
+      email,
+      password,
+      name
+    }
   } = req;
 
   try {

@@ -9,6 +9,41 @@ module.exports = function socket(app) {
   });
 
   app.io.on("connection", (socket) => {
+    socket.on("disconnect", (reason) => {
+      for (const [roomId, currentRoom] of activatedRoomList) {
+        currentRoom.participants.some((participant, index) => {
+          if (participant.socketId === socket.id) {
+            if (currentRoom.owner.socketId === socket.id) {
+              activatedRoomList.delete(roomId);
+
+              app.io.to(roomId).emit("receive participants", null);
+
+              return true;
+            }
+
+            currentRoom.participants.splice(index, 1);
+
+            app.io.to(roomId).emit(
+              "receive participants",
+              currentRoom
+            );
+
+            app.io.to(roomId).emit(
+              "user left",
+              participant
+            );
+
+            return true;
+          }
+        });
+      }
+
+      app.io.emit(
+        "receive activeRoomList",
+        Array.from(activatedRoomList.entries())
+      );
+    });
+
     socket.on("join", (user, roomId) => {
       if (!user.email) return;
 
@@ -20,7 +55,7 @@ module.exports = function socket(app) {
         const targetRoomInfo = activatedRoomList.get(roomId);
         const userInfo = {
           email,
-          isOwner: targetRoomInfo.owner === email,
+          isOwner: targetRoomInfo.owner.email === email,
           socketId: socket.id
         };
 
@@ -33,7 +68,8 @@ module.exports = function socket(app) {
       );
 
       app.io.to(roomId).emit(
-        "receive targetRoomInfo", activatedRoomList.get(roomId)
+        "receive targetRoomInfo",
+        activatedRoomList.get(roomId)
       );
     });
 
@@ -42,13 +78,32 @@ module.exports = function socket(app) {
       const { title, roomId } = roomInfo;
       const newRoom = {
         roomTitle: title,
-        owner: email,
+        owner: { email, socketId: socket.id },
         participants: [],
         contents: ""
       };
 
       activatedRoomList.set(roomId, newRoom);
       typingUsersInEachRoom.set(roomId, new Map());
+    });
+
+    socket.on("sending signal", payload => {
+      app.io.to(payload.userToSignal).emit(
+        "user joined",
+        {
+          signal: payload.signal,
+          isOwner: payload.isUserOwner,
+          callerID: payload.callerID
+        });
+    });
+
+    socket.on("returning signal", payload => {
+      app.io.to(payload.callerID).emit(
+        "receiving returned signal",
+        {
+          signal: payload.signal,
+          id: socket.id
+        });
     });
 
     socket.on("bye", (email, roomId) => {
@@ -63,6 +118,9 @@ module.exports = function socket(app) {
 
         app.io.to(roomId).emit("receive participants", null);
       } else {
+        const targetParticipant = currentRoom.participants.find(
+          (participant) => participant.email === email
+        );
         const filtedparticipants = currentRoom.participants.filter(
           (participant) => participant.email !== email
         );
@@ -77,6 +135,11 @@ module.exports = function socket(app) {
         app.io.emit(
           "receive activeRoomList",
           Array.from(activatedRoomList.entries())
+        );
+
+        app.io.to(roomId).emit(
+          "user left",
+          targetParticipant
         );
       }
     });
