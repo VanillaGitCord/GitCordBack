@@ -19,7 +19,7 @@ const User = new mongoose.Schema({
     type: String,
     require: true
   },
-  document: {
+  documents: {
     type: [{
       type: mongoose.Types.ObjectId,
       ref: "Document"

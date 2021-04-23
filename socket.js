@@ -10,14 +10,15 @@ module.exports = function socket(app) {
 
   app.io.on("connection", (socket) => {
     socket.on("disconnect", (reason) => {
+      let deleteRoomIndex;
+
       for (const [roomId, currentRoom] of activatedRoomList) {
         currentRoom.participants.some((participant, index) => {
           if (participant.socketId === socket.id) {
             if (currentRoom.owner.socketId === socket.id) {
-              activatedRoomList.delete(roomId);
+              deleteRoomIndex = roomId;
 
               app.io.to(roomId).emit("receive participants", null);
-
               return true;
             }
 
@@ -37,6 +38,10 @@ module.exports = function socket(app) {
           }
         });
       }
+
+      socket.leave(deleteRoomIndex);
+
+      activatedRoomList.delete(deleteRoomIndex);
 
       app.io.emit(
         "receive activeRoomList",
@@ -111,14 +116,22 @@ module.exports = function socket(app) {
 
       if (!currentRoom) return;
 
+      const targetParticipant = currentRoom.participants.find(
+        (participant) => participant.email === email
+      );
+
+      socket.leave(roomId);
+
       if (currentRoom.owner.email === email) {
         activatedRoomList.delete(roomId);
 
         app.io.to(roomId).emit("receive participants", null);
-      } else {
-        const targetParticipant = currentRoom.participants.find(
-          (participant) => participant.email === email
+
+        app.io.to(roomId).emit(
+          "user left",
+          targetParticipant
         );
+      } else {
         const filtedparticipants = currentRoom.participants.filter(
           (participant) => participant.email !== email
         );
@@ -131,7 +144,7 @@ module.exports = function socket(app) {
         );
 
         app.io.emit(
-          "receive activeRoomList",
+        "receive activeRoomList",
           Array.from(activatedRoomList.entries())
         );
 
