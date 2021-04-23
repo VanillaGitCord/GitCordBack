@@ -116,16 +116,22 @@ module.exports = function socket(app) {
 
       if (!currentRoom) return;
 
+      const targetParticipant = currentRoom.participants.find(
+        (participant) => participant.email === email
+      );
+
       socket.leave(roomId);
 
       if (currentRoom.owner.email === email) {
         activatedRoomList.delete(roomId);
 
         app.io.to(roomId).emit("receive participants", null);
-      } else {
-        const targetParticipant = currentRoom.participants.find(
-          (participant) => participant.email === email
+
+        app.io.to(roomId).emit(
+          "user left",
+          targetParticipant
         );
+      } else {
         const filtedparticipants = currentRoom.participants.filter(
           (participant) => participant.email !== email
         );
@@ -194,6 +200,8 @@ module.exports = function socket(app) {
         roomId
       } = stopTypingUserInfo;
       const typingUsers = typingUsersInEachRoom.get(roomId);
+
+      if (!typingUsers) return;
 
       typingUsers.delete(email);
 
