@@ -1,7 +1,7 @@
 module.exports.checkUser = async (req, res, next) => {
   const {
     user,
-    accessToken,
+    accessToken
   } = req;
 
   res.json({

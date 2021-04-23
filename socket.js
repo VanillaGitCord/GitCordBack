@@ -9,6 +9,41 @@ module.exports = function socket(app) {
   });
 
   app.io.on("connection", (socket) => {
+    socket.on("disconnect", (reason) => {
+      for (const [roomId, currentRoom] of activatedRoomList) {
+        currentRoom.participants.some((participant, index) => {
+          if (participant.socketId === socket.id) {
+            if (currentRoom.owner.socketId === socket.id) {
+              activatedRoomList.delete(roomId);
+
+              app.io.to(roomId).emit("receive participants", null);
+
+              return true;
+            }
+
+            currentRoom.participants.splice(index, 1);
+
+            app.io.to(roomId).emit(
+              "receive participants",
+              currentRoom
+            );
+
+            app.io.to(roomId).emit(
+              "user left",
+              participant
+            );
+
+            return true;
+          }
+        });
+      }
+
+      app.io.emit(
+        "receive activeRoomList",
+        Array.from(activatedRoomList.entries())
+      );
+    });
+
     socket.on("join", (user, roomId) => {
       if (!user.email) return;
 
@@ -20,7 +55,7 @@ module.exports = function socket(app) {
         const targetRoomInfo = activatedRoomList.get(roomId);
         const userInfo = {
           email,
-          isOwner: targetRoomInfo.owner === email,
+          isOwner: targetRoomInfo.owner.email === email,
           socketId: socket.id
         };
 
@@ -43,7 +78,7 @@ module.exports = function socket(app) {
       const { title, roomId } = roomInfo;
       const newRoom = {
         roomTitle: title,
-        owner: email,
+        owner: { email, socketId: socket.id },
         participants: [],
         contents: ""
       };
@@ -76,7 +111,7 @@ module.exports = function socket(app) {
 
       if (!currentRoom) return;
 
-      if (currentRoom.owner === email) {
+      if (currentRoom.owner.email === email) {
         activatedRoomList.delete(roomId);
 
         app.io.to(roomId).emit("receive participants", null);
