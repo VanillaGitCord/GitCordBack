@@ -56,6 +56,8 @@ module.exports = function socket(app) {
 
       if (!currentRoom) return;
 
+      socket.leave(roomId);
+
       if (currentRoom.owner === email) {
         activatedRoomList.delete(roomId);
 
