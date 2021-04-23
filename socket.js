@@ -188,7 +188,7 @@ module.exports = function socket(app) {
       } = stopTypingUserInfo;
       const typingUsers = typingUsersInEachRoom.get(roomId);
 
-      typingUsers.delete(email);
+      typingUsers && typingUsers.delete(email);
 
       app.io.to(roomId).emit(
         "receive filtered user list",
