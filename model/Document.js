@@ -1,6 +1,10 @@
 const mongoose = require("mongoose");
 
 const Document = new mongoose.Schema({
+  title: {
+    type: String,
+    default: ""
+  },
   contents: {
     type: String,
     default: ""

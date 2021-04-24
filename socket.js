@@ -211,6 +211,12 @@ module.exports = function socket(app) {
       );
     });
 
+    socket.on("set contents", (contentsInfo) => {
+      const { value, roomId } = contentsInfo;
+
+      app.io.to(roomId).emit("receive document text", value);
+    });
+
     socket.on("set initial text", (roomId) => {
       const roomInfo = activatedRoomList.get(roomId);
 
