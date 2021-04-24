@@ -201,9 +201,7 @@ module.exports = function socket(app) {
       } = stopTypingUserInfo;
       const typingUsers = typingUsersInEachRoom.get(roomId);
 
-      if (!typingUsers) return;
-
-      typingUsers.delete(email);
+      typingUsers && typingUsers.delete(email);
 
       app.io.to(roomId).emit(
         "receive filtered user list",
@@ -222,6 +220,14 @@ module.exports = function socket(app) {
 
       if (!roomInfo) return;
       app.io.to(roomId).emit("receive initial text", roomInfo.contents);
+    });
+
+    socket.on("send draw Start", (roomId, pos) => {
+      app.io.to(roomId).emit("drawStart", pos).broadcast;
+    });
+
+    socket.on("sendDraw", (roomId, pos) => {
+      app.io.to(roomId).emit("drawing", pos).broadcast;
     });
   });
 }
