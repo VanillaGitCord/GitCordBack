@@ -73,6 +73,7 @@ module.exports.deleteDocument = async (req, res, next) => {
             message: "삭제에 실패했습니다."
           });
         }
+
         const { documents, _id } = document.owner;
         const filteredDocuments = documents.filter((document) =>
           String(document) !== documentId
