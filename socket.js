@@ -223,19 +223,18 @@ module.exports = function socket(app) {
     });
 
     socket.on("send draw Start", (roomId, pos) => {
-      app.io.to(roomId).emit("drawStart", pos).broadcast;
+      app.io.to(roomId).emit("draw start", pos).broadcast;
     });
 
-    socket.on("sendDraw", (roomId, pos) => {
+    socket.on("send draw", (roomId, pos) => {
       app.io.to(roomId).emit("drawing", pos).broadcast;
     });
 
-    socket.on("deleteCanvas", (roomId) => {
-      app.io.to(roomId).emit("clearCanvas");
+    socket.on("delete canvas", (roomId) => {
+      app.io.to(roomId).emit("clear canvas");
     });
 
     socket.on("change color", (roomId, color) => {
-      console.log(roomId, color);
       app.io.to(roomId).emit("receive color", color);
     });
   });
