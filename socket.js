@@ -211,6 +211,9 @@ module.exports = function socket(app) {
 
     socket.on("set contents", (contentsInfo) => {
       const { value, roomId } = contentsInfo;
+      const targetRoomInfo = activatedRoomList.get(roomId);
+
+      targetRoomInfo.contents = value;
 
       app.io.to(roomId).emit("receive document text", value);
     });
