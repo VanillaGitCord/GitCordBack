@@ -229,5 +229,9 @@ module.exports = function socket(app) {
     socket.on("sendDraw", (roomId, pos) => {
       app.io.to(roomId).emit("drawing", pos).broadcast;
     });
+
+    socket.on("deleteCanvas", (roomId) => {
+      app.io.to(roomId).emit("clearCanvas");
+    });
   });
 }
