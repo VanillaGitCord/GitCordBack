@@ -233,5 +233,10 @@ module.exports = function socket(app) {
     socket.on("deleteCanvas", (roomId) => {
       app.io.to(roomId).emit("clearCanvas");
     });
+
+    socket.on("change color", (roomId, color) => {
+      console.log(roomId, color);
+      app.io.to(roomId).emit("receive color", color);
+    });
   });
 }
