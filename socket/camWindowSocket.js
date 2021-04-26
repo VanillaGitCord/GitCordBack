@@ -1,23 +1,27 @@
+const EVENT = require("../constants/socketEvents");
+
 module.exports = function camWindowSocket(
   app,
   socket
 ) {
-  socket.on("sending signal", (payload) => {
+  socket.on(EVENT.SENDING_SIGNAL, (payload) => {
     app.io.to(payload.userToSignal).emit(
-      "user joined",
+      EVENT.USER_JOINED,
       {
         signal: payload.signal,
         isOwner: payload.isUserOwner,
         callerID: payload.callerID
-      });
+      }
+    );
   });
 
-  socket.on("returning signal", (payload) => {
+  socket.on(EVENT.RETURNING_SIGNAL, (payload) => {
     app.io.to(payload.callerID).emit(
-      "receiving returned signal",
+      EVENT.RECEIVE_RETURNED_SIGNAL,
       {
         signal: payload.signal,
         id: socket.id
-      });
+      }
+    );
   });
 }

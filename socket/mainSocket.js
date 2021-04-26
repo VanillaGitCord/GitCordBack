@@ -1,9 +1,11 @@
+const EVENT = require("../constants/socketEvents");
+
 module.exports = function connectSocketMain(
   app,
   socket,
   activatedRoomList
 ) {
-  socket.on("join", (user, roomId) => {
+  socket.on(EVENT.JOIN, (user, roomId) => {
     if (!user.email) return;
 
     const { email } = user;
@@ -22,17 +24,17 @@ module.exports = function connectSocketMain(
     }
 
     app.io.emit(
-      "receive active room list",
+      EVENT.RECEIVE_ACTIVE_ROOM_LIST,
       Array.from(activatedRoomList.entries())
     );
 
     app.io.to(roomId).emit(
-      "receive target room info",
+      EVENT.RECEIVE_TARGET_ROOM_INFO,
       activatedRoomList.get(roomId)
     );
   });
 
-  socket.on("bye", (email, roomId) => {
+  socket.on(EVENT.BYE, (email, roomId) => {
     let currentRoom = activatedRoomList.get(roomId);
 
     if (!currentRoom) return;
@@ -46,10 +48,10 @@ module.exports = function connectSocketMain(
     if (currentRoom.owner.email === email) {
       activatedRoomList.delete(roomId);
 
-      app.io.to(roomId).emit("receive participants", null);
+      app.io.to(roomId).emit(EVENT.RECEIVE_PARTICIPANTS, null);
 
       app.io.to(roomId).emit(
-        "user left",
+        EVENT.USER_LEFT,
         targetParticipant
       );
     } else {
@@ -60,12 +62,12 @@ module.exports = function connectSocketMain(
       currentRoom.participants = filtedparticipants;
 
       app.io.to(roomId).emit(
-        "receive participants",
+        EVENT.RECEIVE_PARTICIPANTS,
         activatedRoomList.get(roomId)
       );
 
       app.io.to(roomId).emit(
-        "user left",
+        EVENT.USER_LEFT,
         targetParticipant
       );
     }

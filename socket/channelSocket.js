@@ -1,17 +1,19 @@
+const EVENT = require("../constants/socketEvents");
+
 module.exports = function channelSocket(
   app,
   socket,
   activatedRoomList,
   typingUsersInEachRoom
 ) {
-  socket.on("init room list", () => {
+  socket.on(EVENT.INIT_ROOM_LIST, () => {
     app.io.emit(
-      "receive active room list",
+      EVENT.RECEIVE_ACTIVE_ROOM_LIST,
       Array.from(activatedRoomList.entries())
-      );
+    );
   });
 
-  socket.on("create room", (user, roomInfo) => {
+  socket.on(EVENT.CREATE_ROOM, (user, roomInfo) => {
     const { email } = user;
     const { title, roomId } = roomInfo;
     const newRoom = {

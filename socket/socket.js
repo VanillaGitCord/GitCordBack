@@ -4,6 +4,7 @@ const channelSocket = require("./channelSocket");
 const codeEditorSocket = require("./codeEditorSocket");
 const whiteBoardSocket = require("./whiteBoardSocket");
 const chatSocket = require("./chatSocket");
+const EVENT = require("../constants/socketEvents");
 
 const activatedRoomList = new Map();
 const typingUsersInEachRoom = new Map();
@@ -15,8 +16,8 @@ module.exports = function socket(app) {
     }
   });
 
-  app.io.on("connection", (socket) => {
-    socket.on("disconnect", () => {
+  app.io.on(EVENT.CONNECTION, (socket) => {
+    socket.on(EVENT.DISCONNECTION, () => {
       let deleteRoomIndex;
 
       for (const [roomId, currentRoom] of activatedRoomList) {
@@ -25,19 +26,19 @@ module.exports = function socket(app) {
             if (currentRoom.owner.socketId === socket.id) {
               deleteRoomIndex = roomId;
 
-              app.io.to(roomId).emit("receive participants", null);
+              app.io.to(roomId).emit(EVENT.RECEIVE_PARTICIPANTS, null);
               return true;
             }
 
             currentRoom.participants.splice(index, 1);
 
             app.io.to(roomId).emit(
-              "receive participants",
+              EVENT.RECEIVE_PARTICIPANTS,
               currentRoom
             );
 
             app.io.to(roomId).emit(
-              "user left",
+              EVENT.USER_LEFT,
               participant
             );
 
@@ -51,7 +52,7 @@ module.exports = function socket(app) {
       activatedRoomList.delete(deleteRoomIndex);
 
       app.io.emit(
-        "receive active room list",
+        EVENT.RECEIVE_ACTIVE_ROOM_LIST,
         Array.from(activatedRoomList.entries())
       );
     });

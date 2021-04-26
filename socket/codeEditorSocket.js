@@ -1,10 +1,12 @@
+const EVENT =  require("../constants/socketEvents");
+
 module.exports = function codeEditorSocket(
   app,
   socket,
   activatedRoomList,
   typingUsersInEachRoom
 ) {
-  socket.on("start typing", (data) => {
+  socket.on(EVENT.START_TYPING, (data) => {
     const {
       typingUser: { name, email },
       value,
@@ -21,10 +23,10 @@ module.exports = function codeEditorSocket(
       typingUsers: Array.from(typingUsers.values())
     };
 
-    app.io.to(roomId).emit("receive text", typingInfo);
+    app.io.to(roomId).emit(EVENT.RECEIVE_TEXT, typingInfo);
   });
 
-  socket.on("stop typing", (stopTypingUserInfo) => {
+  socket.on(EVENT.STOP_TYPING, (stopTypingUserInfo) => {
     if (!stopTypingUserInfo) return;
 
     const {
@@ -36,24 +38,24 @@ module.exports = function codeEditorSocket(
     typingUsers && typingUsers.delete(email);
 
     app.io.to(roomId).emit(
-      "receive filtered user list",
+      EVENT.RECEIVE_FILTERED_USER_LIST,
       typingUsers
     );
   });
 
-  socket.on("set contents", (contentsInfo) => {
+  socket.on(EVENT.SET_CONTENTS, (contentsInfo) => {
     const { value, roomId } = contentsInfo;
     const targetRoomInfo = activatedRoomList.get(roomId);
 
     targetRoomInfo.contents = value;
 
-    app.io.to(roomId).emit("receive document text", value);
+    app.io.to(roomId).emit(EVENT.RECEIVE_DOCUMENT_TEXT, value);
   });
 
-  socket.on("set initial text", (roomId) => {
+  socket.on(EVENT.SET_INITIAL_TEXT, (roomId) => {
     const roomInfo = activatedRoomList.get(roomId);
 
     if (!roomInfo) return;
-    app.io.to(roomId).emit("receive initial text", roomInfo.contents);
+    app.io.to(roomId).emit(RECEIVE_INITIAL_TEXT, roomInfo.contents);
   });
 }
