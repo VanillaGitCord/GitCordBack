@@ -19,6 +19,7 @@ module.exports = function socket(app) {
               deleteRoomIndex = roomId;
 
               app.io.to(roomId).emit("receive participants", null);
+
               return true;
             }
 
@@ -52,7 +53,7 @@ module.exports = function socket(app) {
     socket.on("join", (user, roomId) => {
       if (!user.email) return;
 
-      const { email } = user;
+      const { email, name } = user;
 
       socket.join(roomId);
 
@@ -60,8 +61,10 @@ module.exports = function socket(app) {
         const targetRoomInfo = activatedRoomList.get(roomId);
         const userInfo = {
           email,
+          name,
           isOwner: targetRoomInfo.owner.email === email,
-          socketId: socket.id
+          socketId: socket.id,
+          isStreaming: true
         };
 
         targetRoomInfo.participants.push(userInfo);
@@ -143,16 +146,16 @@ module.exports = function socket(app) {
           activatedRoomList.get(roomId)
         );
 
-        app.io.emit(
-        "receive active room list",
-          Array.from(activatedRoomList.entries())
-        );
-
         app.io.to(roomId).emit(
           "user left",
           targetParticipant
         );
       }
+
+      app.io.emit(
+        "receive active room list",
+        Array.from(activatedRoomList.entries())
+      );
     });
 
     socket.on("send chat", (chatLog) => {
@@ -240,5 +243,19 @@ module.exports = function socket(app) {
     socket.on("change color", (roomId, color) => {
       app.io.to(roomId).emit("receive color", color);
     });
+
+    socket.on("video toggle", (roomId, user) => {
+      const { participants } = activatedRoomList.get(roomId);
+      participants.forEach(participant => {
+        if (participant.email === user.email) {
+          participant.isStreaming = !participant.isStreaming;
+        }
+      });
+
+      app.io.to(roomId).emit(
+        "receive participants",
+        activatedRoomList.get(roomId)
+      );
+    })
   });
 }
