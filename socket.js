@@ -9,7 +9,7 @@ module.exports = function socket(app) {
   });
 
   app.io.on("connection", (socket) => {
-    socket.on("disconnect", (reason) => {
+    socket.on("disconnect", () => {
       let deleteRoomIndex;
 
       for (const [roomId, currentRoom] of activatedRoomList) {
@@ -44,7 +44,7 @@ module.exports = function socket(app) {
       activatedRoomList.delete(deleteRoomIndex);
 
       app.io.emit(
-        "receive activeRoomList",
+        "receive active room list",
         Array.from(activatedRoomList.entries())
       );
     });
@@ -68,12 +68,12 @@ module.exports = function socket(app) {
       }
 
       app.io.emit(
-        "receive activeRoomList",
+        "receive active room list",
         Array.from(activatedRoomList.entries())
       );
 
       app.io.to(roomId).emit(
-        "receive targetRoomInfo",
+        "receive target room info",
         activatedRoomList.get(roomId)
       );
     });
@@ -144,7 +144,7 @@ module.exports = function socket(app) {
         );
 
         app.io.emit(
-        "receive activeRoomList",
+        "receive active room list",
           Array.from(activatedRoomList.entries())
         );
 
@@ -163,14 +163,14 @@ module.exports = function socket(app) {
 
     socket.on("init roomList", () => {
       app.io.emit(
-        "receive activeRoomList",
+        "receive active room list",
         Array.from(activatedRoomList.entries())
         );
     });
 
-    socket.on("changeEvent", (data) => {
-      app.io.emit("changeEvent", data);
-    });
+    // socket.on("changeEvent", (data) => {
+    //   app.io.emit("changeEvent", data);
+    // });
 
     socket.on("start typing", (data) => {
       const {
@@ -225,7 +225,7 @@ module.exports = function socket(app) {
       app.io.to(roomId).emit("receive initial text", roomInfo.contents);
     });
 
-    socket.on("send draw Start", (roomId, pos) => {
+    socket.on("send draw start", (roomId, pos) => {
       app.io.to(roomId).emit("draw start", pos).broadcast;
     });
 
