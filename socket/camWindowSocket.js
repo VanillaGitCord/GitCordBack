@@ -28,6 +28,7 @@ module.exports = function camWindowSocket(
 
   socket.on(EVENT.VIDEO_TOGGLE, (roomId, user) => {
     const { participants } = activatedRoomList.get(roomId);
+
     participants.forEach(participant => {
       if (participant.email === user.email) {
         participant.isStreaming = !participant.isStreaming;
