@@ -2,7 +2,8 @@ const EVENT = require("../constants/socketEvents");
 
 module.exports = function camWindowSocket(
   app,
-  socket
+  socket,
+  activatedRoomList
 ) {
   socket.on(EVENT.SENDING_SIGNAL, (payload) => {
     app.io.to(payload.userToSignal).emit(

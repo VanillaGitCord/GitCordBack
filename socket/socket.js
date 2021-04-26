@@ -57,22 +57,8 @@ module.exports = function socket(app) {
       );
     });
 
-    socket.on("video toggle", (roomId, user) => {
-      const { participants } = activatedRoomList.get(roomId);
-      participants.forEach(participant => {
-        if (participant.email === user.email) {
-          participant.isStreaming = !participant.isStreaming;
-        }
-      });
-
-      app.io.to(roomId).emit(
-        "receive participants",
-        activatedRoomList.get(roomId)
-      );
-    });
-
     connectSocketMain(app, socket, activatedRoomList);
-    camWindowSocket(app, socket);
+    camWindowSocket(app, socket, activatedRoomList);
     channelSocket(app, socket, activatedRoomList, typingUsersInEachRoom);
     codeEditorSocket(app, socket, activatedRoomList, typingUsersInEachRoom);
     whiteBoardSocket(app, socket);
