@@ -30,5 +30,6 @@ module.exports = {
   DELETE_CANVAS: "delete canvas",
   CLEAR_CANVAS: "clear canvas",
   CHANGE_COLOR: "change color",
-  RECEIVE_COLOR: "receive color"
+  RECEIVE_COLOR: "receive color",
+  VIDEO_TOGGLE: "video toggle"
 };
