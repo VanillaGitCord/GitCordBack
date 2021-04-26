@@ -23,7 +23,7 @@ app.use(cors({
   credentials: true
 }));
 
-require("./socket")(app);
+require("./socket/socket")(app);
 
 app.use("/user", userRouter);
 app.use("/auth", authRouter);
