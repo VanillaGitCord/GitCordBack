@@ -58,7 +58,7 @@ module.exports = function socket(app) {
     });
 
     connectSocketMain(app, socket, activatedRoomList);
-    camWindowSocket(app, socket);
+    camWindowSocket(app, socket, activatedRoomList);
     channelSocket(app, socket, activatedRoomList, typingUsersInEachRoom);
     codeEditorSocket(app, socket, activatedRoomList, typingUsersInEachRoom);
     whiteBoardSocket(app, socket);

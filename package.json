@@ -1,7 +1,7 @@
 {
   "name": "gitcordback",
   "engines": {
-    "node": ">=12.0"
+    "node": "14.15.4"
   },
   "version": "0.1.0",
   "private": true,

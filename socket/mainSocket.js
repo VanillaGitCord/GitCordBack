@@ -8,7 +8,7 @@ module.exports = function connectSocketMain(
   socket.on(EVENT.JOIN, (user, roomId) => {
     if (!user.email) return;
 
-    const { email } = user;
+    const { email, name } = user;
 
     socket.join(roomId);
 
@@ -16,8 +16,10 @@ module.exports = function connectSocketMain(
       const targetRoomInfo = activatedRoomList.get(roomId);
       const userInfo = {
         email,
+        name,
         isOwner: targetRoomInfo.owner.email === email,
-        socketId: socket.id
+        socketId: socket.id,
+        isStreaming: true
       };
 
       targetRoomInfo.participants.push(userInfo);

@@ -2,7 +2,8 @@ const EVENT = require("../constants/socketEvents");
 
 module.exports = function camWindowSocket(
   app,
-  socket
+  socket,
+  activatedRoomList
 ) {
   socket.on(EVENT.SENDING_SIGNAL, (payload) => {
     app.io.to(payload.userToSignal).emit(
@@ -22,6 +23,21 @@ module.exports = function camWindowSocket(
         signal: payload.signal,
         id: socket.id
       }
+    );
+  });
+
+  socket.on(EVENT.VIDEO_TOGGLE, (roomId, user) => {
+    const { participants } = activatedRoomList.get(roomId);
+
+    participants.forEach(participant => {
+      if (participant.email === user.email) {
+        participant.isStreaming = !participant.isStreaming;
+      }
+    });
+
+    app.io.to(roomId).emit(
+      EVENT.RECEIVE_PARTICIPANTS,
+      activatedRoomList.get(roomId)
     );
   });
 }
