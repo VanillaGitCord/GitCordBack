@@ -10,7 +10,7 @@ module.exports = function camWindowSocket(
       EVENT.USER_JOINED,
       {
         signal: payload.signal,
-        isOwner: payload.isUserOwner,
+        isOwner: payload.isOwner,
         callerID: payload.callerID
       }
     );

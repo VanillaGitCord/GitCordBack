@@ -73,16 +73,13 @@ module.exports.deleteDocument = async (req, res, next) => {
             message: "삭제에 실패했습니다."
           });
         }
-
+        
         const { documents, _id } = document.owner;
         const filteredDocuments = documents.filter((document) =>
           String(document) !== documentId
         );
 
-        const user = await User.findById({ _id });
-
-        user.documents = filteredDocuments;
-        await user.save();
+        await User.findByIdAndUpdate(_id, { $set: { documents: filteredDocuments }});
       });
 
       await Document.deleteOne({ _id: documentId });
