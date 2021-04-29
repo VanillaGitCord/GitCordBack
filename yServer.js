@@ -9,7 +9,7 @@ const wsReadyStateClosed = 3;
 
 const pingTimeout = 30000;
 
-const port = process.env.PORT || process.env.Y_SERVER_URL;
+const port = process.env.PORT || process.env.Y_SERVER_PORT;
 
 const wss = new ws.Server({ noServer: true });
 
