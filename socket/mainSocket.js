@@ -25,6 +25,15 @@ module.exports = function connectSocketMain(
       targetRoomInfo.participants.push(userInfo);
     }
 
+    const systemChat = {
+      chatTime: null,
+      userName: name,
+      userChat: null,
+      userEmail: email
+    };
+
+    app.io.to(roomId).emit(EVENT.RECEIVE_CHAT, systemChat);
+
     app.io.emit(
       EVENT.RECEIVE_ACTIVE_ROOM_LIST,
       Array.from(activatedRoomList.entries())
