@@ -29,7 +29,8 @@ module.exports = function connectSocketMain(
       chatTime: null,
       userName: name,
       userChat: null,
-      userEmail: email
+      userEmail: email,
+      systemLog: `${name}님이 입장하셨습니다.`
     };
 
     app.io.to(roomId).emit(EVENT.RECEIVE_CHAT, systemChat);
@@ -45,7 +46,8 @@ module.exports = function connectSocketMain(
     );
   });
 
-  socket.on(EVENT.BYE, (email, roomId) => {
+  socket.on(EVENT.BYE, (user, roomId) => {
+    const { name, email } = user;
     let currentRoom = activatedRoomList.get(roomId);
 
     if (!currentRoom) return;
@@ -71,6 +73,16 @@ module.exports = function connectSocketMain(
       );
 
       currentRoom.participants = filtedparticipants;
+
+      const systemChat = {
+        chatTime: null,
+        userName: name,
+        userChat: null,
+        userEmail: email,
+        systemLog: `${name}님이 퇴장하셨습니다.`
+      };
+
+      app.io.to(roomId).emit(EVENT.RECEIVE_CHAT, systemChat);
 
       app.io.to(roomId).emit(
         EVENT.RECEIVE_PARTICIPANTS,
