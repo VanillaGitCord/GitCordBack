@@ -24,7 +24,7 @@ app.use(cors({
 }));
 
 require("./socket/socket")(app);
-//require("./yServer");
+require("./yServer");
 
 app.use("/user", userRouter);
 app.use("/auth", authRouter);
