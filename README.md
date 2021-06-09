@@ -66,7 +66,7 @@ Server
 
 # stack
 
-Clinet
+Client
   - React
   - React router
   - Redux
@@ -95,7 +95,7 @@ Server
 - AWS Elastic Beanstalk를 사용하여 애플리케이션 배포 및 관리
 - Amazon ACM (AWS Certificate Manager)을 사용하여 SSL 관리 (HHTPS 프로토콜)
 
-## Chanllenge
+## Challenge
 
 ### React 렌더링과 socket 이벤트
 
