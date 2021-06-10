@@ -68,7 +68,7 @@ GitCord는 하나의 방에 여러 유저들이 모여 **실시간으로 음성,
 
 # 🛠 stack
 
-### Client
+### Frontend
   - React
   - React router
   - Redux
@@ -80,7 +80,7 @@ GitCord는 하나의 방에 여러 유저들이 모여 **실시간으로 음성,
   - codeMirror
   - cypress
 
-### Server
+### Backend
   - argon2
   - Express.js
   - json web token
@@ -90,14 +90,14 @@ GitCord는 하나의 방에 여러 유저들이 모여 **실시간으로 음성,
 
 # 🌐 Deploy
 
-### Frontend
+### Client
 - Netlify를 이용하여 애플리케이션 배포 및 관리
 
-### Backend
+### Server
 - AWS Elastic Beanstalk를 사용하여 애플리케이션 배포 및 관리
 - Amazon ACM (AWS Certificate Manager)을 사용하여 SSL 관리 (HHTPS 프로토콜)
 
-# 🥊 Challenge
+# 🥊 Challenges
 
 ### React 렌더링과 socket 이벤트
 
