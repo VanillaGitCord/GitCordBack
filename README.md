@@ -1,12 +1,14 @@
 # GitCord
 
+**"Git"hub + Dis"Cord" = GitCord**
+
 <img src="./readmeAssets/images/gitCord.png" />
 
 GitCord는 하나의 방에 여러 유저들이 모여 **실시간으로 음성, 화상으로 소통하며 코드를 작성할 수 있는 웹 어플리케이션입니다.**
 
 👉Frontend Address: <a href="https://github.com/VanillaGitCord/GitCordFront">https://github.com/VanillaGitCord/GitCordFront</a>
 
-## Motivation
+## 💡 Motivation
 
 1. 웹의 장점: 앱 어플리케이션과 비교했을 때 웹 어플리케이션의 장점은 접근성과 편리함 보단 <b>"생산성"</b>이라고 생각했고,
 
@@ -15,7 +17,7 @@ GitCord는 하나의 방에 여러 유저들이 모여 **실시간으로 음성,
 3. 블루오션: 온라인 화상 플랫폼 중에서도 기존의 Zoom이나 다른 화상 플랫폼을 클론하기 보단 <u>**시중에 없는 아이템을 찾아 고민**</u>했고
 **Github나 Codepen같은 code editing 플랫폼을 <u>실시간</u>으로 함께 소통할 수 있는 플랫폼**이 있으면 좋겠다는 생각을 가지고 기획 되었습니다.
 
-# Features
+# ⚙ Features
 
 - 로컬 회원 가입 / 로그인 기능
 - 구글 소셜 로그인
@@ -30,7 +32,7 @@ GitCord는 하나의 방에 여러 유저들이 모여 **실시간으로 음성,
 - 방 URL 클립보드 copy 기능
 - 화이트 보드 기능 (color picker & All clear 내장)
 
-# Demo
+# 🎞 Demo
 
 ## Enter Room
 
@@ -48,25 +50,25 @@ GitCord는 하나의 방에 여러 유저들이 모여 **실시간으로 음성,
 
 <img src="./readmeAssets/images/deleteAndLoadCode.gif" />
 
-# How to use
+# 🕹 How to use
 
-Client
+### Client
 ```
   git clone https://github.com/VanillaGitCord/GitCordFront.git
   npm install
   npm start
 ```
 
-Server
+### Server
 ```
   git clone https://github.com/VanillaGitCord/GitCordBack.git
   npm install
   npm run dev
 ```
 
-# stack
+# 🛠 stack
 
-Client
+### Client
   - React
   - React router
   - Redux
@@ -78,7 +80,7 @@ Client
   - codeMirror
   - cypress
 
-Server
+### Server
   - argon2
   - Express.js
   - json web token
@@ -86,7 +88,7 @@ Server
   - mongoose
   - socket.io
 
-## Deploy
+# 🌐 Deploy
 
 ### Frontend
 - Netlify를 이용하여 애플리케이션 배포 및 관리
@@ -95,7 +97,7 @@ Server
 - AWS Elastic Beanstalk를 사용하여 애플리케이션 배포 및 관리
 - Amazon ACM (AWS Certificate Manager)을 사용하여 SSL 관리 (HHTPS 프로토콜)
 
-## Challenge
+# 🥊 Challenge
 
 ### React 렌더링과 socket 이벤트
 
