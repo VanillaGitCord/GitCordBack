@@ -162,33 +162,3 @@ GitCord는 하나의 방에 여러 유저들이 모여 **실시간으로 음성,
 
   따라서, Redirect 혹은 Link 시에 "authRouting"이라는 flag를 주어 사용자가 제대로된 경로를 통해 접근했다는 사실을 알렸고
   그렇지 않은 경우에는 Error로 Redirect하도록 처리하여 접근을 방지했습니다.
-
-### 완전 동시 수정과 y-codemirror (진행중...)
-
-- CodeMirror 실시간 편집
-
-  기존의 CodeMirror는 textArea에 내용을 받아 새로 CodeMirror를 그려주는 방식으로 되어있어
-  사용자가 typing시에 codeMirror의 content를 socket으로 전송해 방 참여자들에게 뿌려주는 방식으로 공유하였습니다.
-
-  이 방법은, 동시에 여러 참여자들이 편집을 진행 할 시, content의 전송속도보다 사용자 각자의 typing이 빠른 경우
-  content가 왜곡될 수 있다는 단점이 있고, 커서의 위치 또한 왜곡되거나 text의 마지막으로 정렬되어 버리는 문제가 있었습니다.
-
-  Google Docs 처럼 참여자 모두가 동시에 내용을 수정 할 수 있는 방법을 찾아 고민했고 Yjs라는 동시 작업이 가능한
-  Document 자료구조를 발견, Yjs를 적용한 y-codemirror을 적용하고자 하였습니다.
-
-  **y-codemirror는 참여자의 codeMirror를 각각 Peer to Peer로 연결하여 사용자들이 동시에 편집하여도 모두 적용되는 라이브러리입니다.**
-
-  하지만 y-codemirror는 Peer to Peer 시그널링을 위해 <u>반드시 ws:// 혹은 wss:// 프로토콜의 새로운 Web Socket 서버가 필요</u>했고
-  기존의 Express 서버와 aws서버에 적용하려 한 결과, 여러가지 문제가 발생하여 해결하는 중에 있습니다
-
-  ### 해결을 위한 시도들
-
-  1. 기존 Express 서버와 같은 port로 통합 -> 기존 Socket.io와 충돌
-
-  2. socket.io에 web socket 이벤트 로직 심어넣기 -> 해당 이벤트에 응답 없음
-
-  3. 기존 Express 서버와 포트를 다르게해 함께 배포, 포트 각각 설정 -> aws 통신 실패
-
-  4. localhost:4444에 실행 후 ngrok을 통한 port forwading -> http만 forwarding 됨으로 y-codemirror 서버 설정 실패
-
-  5. 새로운 websocket 서버를 배포 (아직 시도 해보지 않음...)
